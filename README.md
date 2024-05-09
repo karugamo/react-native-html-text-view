@@ -5,13 +5,13 @@ Natively render html into a seletable text
 ## Installation
 
 ```sh
-npm install react-native-html-text
+npm install react-native-html-text-view
 ```
 
 ## Usage
 
 ```js
-import { HtmlTextView } from "react-native-html-text";
+import { HtmlTextView } from "react-native-html-text-view";
 
 // ...
 

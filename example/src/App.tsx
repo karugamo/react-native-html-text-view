@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { StyleSheet, View } from 'react-native';
-import HtmlTextView from 'react-native-html-text';
+import HtmlTextView from 'react-native-html-text-view';
 
 export default function App() {
   const html = `<h1>Testing some html</h1>
