@@ -31,10 +31,10 @@ const NativeHtmlTextView =
 
 type HtmlTextProps = {
   html: string;
-  style: ViewStyle;
+  style: ViewStyle & SupportedTextStyle;
 };
 
-export default function HtmlTextView({ style, ...props }: HtmlTextProps) {
+export default function HtmlTextView({ style, html, ...props }: HtmlTextProps) {
   const [height, setHeight] = useState(0);
 
   const onSizeChange = useCallback(
@@ -44,14 +44,75 @@ export default function HtmlTextView({ style, ...props }: HtmlTextProps) {
     [setHeight]
   );
 
+  const { textStyles, viewStyles } = splitStyles(style);
+
+  const wrappedHtml = `<body style="${convertToCSS(textStyles)}">${html}</body>`;
+
   return (
     <NativeHtmlTextView
       onSizeChange={onSizeChange}
+      html={wrappedHtml}
       style={{
-        ...style,
+        ...viewStyles,
+
         height,
       }}
       {...props}
     />
   );
+}
+
+type Test = ViewStyle & SupportedTextStyle;
+
+function splitStyles(style: Test): {
+  textStyles: any;
+  viewStyles: any;
+} {
+  const textStyles: any = {};
+  const viewStyles: any = {};
+
+  for (const prop in style) {
+    if (textProperties.includes(prop as keyof SupportedTextStyle)) {
+      textStyles[prop] = style[prop as keyof SupportedTextStyle];
+    } else {
+      viewStyles[prop] = style[prop as keyof ViewStyle];
+    }
+  }
+
+  return { textStyles, viewStyles };
+}
+
+const textProperties: Array<keyof SupportedTextStyle> = [
+  'fontSize',
+  'fontFamily',
+  'textAlign',
+  'fontWeight',
+  'fontStyle',
+  'textDecorationLine',
+  'lineHeight',
+  'color',
+];
+
+function convertToCSS(styles: Record<string, number | string>) {
+  return Object.keys(styles)
+    .map((key) => {
+      const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
+      if (typeof styles[key] === 'number') {
+        return `${cssKey}: ${styles[key]}px;`;
+      }
+
+      return `${cssKey}: ${styles[key]};`;
+    })
+    .join(' ');
+}
+
+interface SupportedTextStyle {
+  fontSize?: number | string;
+  fontFamily?: string;
+  textAlign?: 'left' | 'right' | 'center';
+  fontWeight?: 'normal' | 'bold';
+  fontStyle?: 'normal' | 'italic';
+  textDecorationLine?: 'none' | 'underline';
+  lineHeight?: number;
+  color?: string;
 }

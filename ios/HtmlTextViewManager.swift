@@ -27,15 +27,23 @@ class HTMLTextView: UITextView {
 
     @objc var html: String? {
         didSet {
-            guard let html = html else { return }
-            let data = Data(html.utf8)
-            let options: [NSAttributedString.DocumentReadingOptionKey: Any] = [.documentType: NSAttributedString.DocumentType.html, .characterEncoding: String.Encoding.utf8.rawValue]
-            DispatchQueue.main.async {
-                if let attributedString = try? NSAttributedString(data: data, options: options, documentAttributes: nil) {
-                    self.attributedText = attributedString
-                    self.invalidateIntrinsicContentSize()
-                    self.updateSizeToReact()
-                }
+            self.updateContent()
+        }
+    }
+
+    private func updateContent() {
+        guard let html = html else { return }
+        let data = Data(html.utf8)
+        let options: [NSAttributedString.DocumentReadingOptionKey: Any] = [
+            .documentType: NSAttributedString.DocumentType.html,
+            .characterEncoding: String.Encoding.utf8.rawValue
+        ]
+
+        DispatchQueue.main.async {
+            if let attributedString = try? NSMutableAttributedString(data: data, options: options, documentAttributes: nil) {
+                self.attributedText = attributedString
+                self.invalidateIntrinsicContentSize()
+                self.updateSizeToReact()
             }
         }
     }

@@ -1,32 +1,29 @@
 import * as React from 'react';
-import { useEffect } from 'react';
 
 import { StyleSheet, View } from 'react-native';
 import HtmlTextView from 'react-native-html-text';
 
 export default function App() {
-  const [html, setHtml] = React.useState(
-    `<strong
-      style='color: red'
-    >strong
-    </strong>`
-  );
-
-  useEffect(() => {
-    setTimeout(() => {
-      setHtml(
-        html +
-          `<strong
-          style='color: blue'
-        >strong
-        </strong>`
-      );
-    }, 1000);
-  }, [html]);
+  const html = `<h1>Testing some html</h1>
+  <p>This is a paragraph</p>
+  <strong>Strong text</strong>
+  <em>Italic text</em>
+  <strong>10px</strong><strong style="font-size: 20px">20px</strong>`;
 
   return (
     <View style={styles.container}>
-      <HtmlTextView html={html} style={styles.box} />
+      <HtmlTextView
+        html={html}
+        style={{
+          width: '100%',
+          flex: 0,
+          backgroundColor: 'lightgray',
+          fontFamily: 'Courier-Bold',
+          fontSize: 18,
+          fontStyle: 'italic',
+          color: 'red',
+        }}
+      />
     </View>
   );
 }
@@ -37,12 +34,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'white',
-  },
-  box: {
-    width: '100%',
-    backgroundColor: 'lightgray',
-    marginVertical: 20,
-    fontSize: 50,
-    textAlign: 'center',
   },
 });
