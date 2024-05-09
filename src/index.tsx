@@ -13,6 +13,9 @@ const LINKING_ERROR =
 
 type HtmlTextProps = {
   html: string;
+  onSizeChange?: (event: {
+    nativeEvent: { width: number; height: number };
+  }) => void;
   style: ViewStyle;
 };
 
