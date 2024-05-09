@@ -6,7 +6,7 @@ import { HtmlTextView } from 'react-native-html-text';
 export default function App() {
   return (
     <View style={styles.container}>
-      <HtmlTextView color="#32a852" style={styles.box} />
+      <HtmlTextView html="<strong>strong</strong> boy" style={styles.box} />
     </View>
   );
 }
@@ -16,10 +16,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'white',
   },
   box: {
-    width: 60,
-    height: 60,
+    width: 200,
+    height: 200,
     marginVertical: 20,
   },
 });

@@ -1,36 +1,63 @@
+import Foundation
+import React
+import UIKit
+
 @objc(HtmlTextViewManager)
 class HtmlTextViewManager: RCTViewManager {
-
-  override func view() -> (HtmlTextView) {
-    return HtmlTextView()
+  override func view() -> UIView! {
+    let htmlView = HTMLTextView()
+    htmlView.isSelectable = true
+    htmlView.isEditable = false
+    htmlView.isScrollEnabled = false
+    htmlView.textContainerInset = .zero
+    htmlView.textContainer.lineFragmentPadding = 0
+    htmlView.backgroundColor = .clear
+    htmlView.isUserInteractionEnabled = true
+    htmlView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    return htmlView
   }
 
-  @objc override static func requiresMainQueueSetup() -> Bool {
-    return false
+  override static func requiresMainQueueSetup() -> Bool {
+    return true
   }
 }
 
-class HtmlTextView : UIView {
+class HTMLTextView: UITextView {
+  @objc var onSizeChange: RCTDirectEventBlock?
 
-  @objc var color: String = "" {
-    didSet {
-      self.backgroundColor = hexStringToUIColor(hexColor: color)
+  func updateSize(width: CGFloat, height: CGFloat, forView htmlView: HTMLTextView) {
+    if let reactTag = htmlView.reactTag {
+      self.onSizeChange?([
+        "reactTag": reactTag,
+        "width": width,
+        "height": height
+      ])
     }
   }
 
-  func hexStringToUIColor(hexColor: String) -> UIColor {
-    let stringScanner = Scanner(string: hexColor)
-
-    if(hexColor.hasPrefix("#")) {
-      stringScanner.scanLocation = 1
+  @objc var html: String? {
+    didSet {
+      guard let html = html else { return }
+      let data = Data(html.utf8)
+      let options: [NSAttributedString.DocumentReadingOptionKey: Any] = [.documentType: NSAttributedString.DocumentType.html, .characterEncoding: String.Encoding.utf8.rawValue]
+      DispatchQueue.main.async {
+        if let attributedString = try? NSAttributedString(data: data, options: options, documentAttributes: nil) {
+          self.attributedText = attributedString
+          self.invalidateIntrinsicContentSize()
+          self.updateSizeToReact()
+        }
+      }
     }
-    var color: UInt32 = 0
-    stringScanner.scanHexInt32(&color)
+  }
 
-    let r = CGFloat(Int(color >> 16) & 0x000000FF)
-    let g = CGFloat(Int(color >> 8) & 0x000000FF)
-    let b = CGFloat(Int(color) & 0x000000FF)
+  private func updateSizeToReact() {
+    self.layoutIfNeeded()
+    let size = self.sizeThatFits(CGSize(width: self.bounds.width, height: CGFloat.greatestFiniteMagnitude))
+    self.updateSize(width: size.width, height: size.height, forView: self)
+  }
 
-    return UIColor(red: r / 255.0, green: g / 255.0, blue: b / 255.0, alpha: 1)
+  override var intrinsicContentSize: CGSize {
+    let size = sizeThatFits(CGSize(width: bounds.width, height: CGFloat.greatestFiniteMagnitude))
+    return CGSize(width: UIView.noIntrinsicMetric, height: size.height)
   }
 }

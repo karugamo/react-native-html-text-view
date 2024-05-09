@@ -12,7 +12,7 @@ const LINKING_ERROR =
   '- You are not using Expo Go\n';
 
 type HtmlTextProps = {
-  color: string;
+  html: string;
   style: ViewStyle;
 };
 
