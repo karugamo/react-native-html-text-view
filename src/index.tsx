@@ -1,3 +1,4 @@
+import React, { useCallback, useState } from 'react';
 import {
   requireNativeComponent,
   UIManager,
@@ -11,7 +12,7 @@ const LINKING_ERROR =
   '- You rebuilt the app after installing the package\n' +
   '- You are not using Expo Go\n';
 
-type HtmlTextProps = {
+type NativeHtmlTextProps = {
   html: string;
   onSizeChange?: (event: {
     nativeEvent: { width: number; height: number };
@@ -21,9 +22,36 @@ type HtmlTextProps = {
 
 const ComponentName = 'HtmlTextView';
 
-export const HtmlTextView =
+const NativeHtmlTextView =
   UIManager.getViewManagerConfig(ComponentName) != null
-    ? requireNativeComponent<HtmlTextProps>(ComponentName)
+    ? requireNativeComponent<NativeHtmlTextProps>(ComponentName)
     : () => {
         throw new Error(LINKING_ERROR);
       };
+
+type HtmlTextProps = {
+  html: string;
+  style: ViewStyle;
+};
+
+export default function HtmlTextView({ style, ...props }: HtmlTextProps) {
+  const [height, setHeight] = useState(0);
+
+  const onSizeChange = useCallback(
+    function (event: { nativeEvent: { width: number; height: number } }) {
+      setHeight(event.nativeEvent.height);
+    },
+    [setHeight]
+  );
+
+  return (
+    <NativeHtmlTextView
+      onSizeChange={onSizeChange}
+      style={{
+        ...style,
+        height,
+      }}
+      {...props}
+    />
+  );
+}
