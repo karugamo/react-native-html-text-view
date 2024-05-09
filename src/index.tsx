@@ -31,17 +31,27 @@ const NativeHtmlTextView =
 
 type HtmlTextProps = {
   html: string;
+  onSizeChange?: (event: { width: number; height: number }) => void;
   style: ViewStyle & SupportedTextStyle;
 };
 
-export default function HtmlTextView({ style, html, ...props }: HtmlTextProps) {
+export default function HtmlTextView({
+  style,
+  html,
+  onSizeChange: onSizeChange,
+  ...props
+}: HtmlTextProps) {
   const [height, setHeight] = useState(0);
 
-  const onSizeChange = useCallback(
+  const onSizeChangeInternal = useCallback(
     function (event: { nativeEvent: { width: number; height: number } }) {
       setHeight(event.nativeEvent.height);
+      onSizeChange?.({
+        width: event.nativeEvent.width,
+        height: event.nativeEvent.height,
+      });
     },
-    [setHeight]
+    [setHeight, onSizeChange]
   );
 
   const { textStyles, viewStyles } = splitStyles(style);
@@ -50,7 +60,7 @@ export default function HtmlTextView({ style, html, ...props }: HtmlTextProps) {
 
   return (
     <NativeHtmlTextView
-      onSizeChange={onSizeChange}
+      onSizeChange={onSizeChangeInternal}
       html={wrappedHtml}
       style={{
         ...viewStyles,

@@ -42,7 +42,6 @@ class HTMLTextView: UITextView {
         DispatchQueue.main.async {
             if let attributedString = try? NSMutableAttributedString(data: data, options: options, documentAttributes: nil) {
                 self.attributedText = attributedString
-                self.invalidateIntrinsicContentSize()
                 self.updateSizeToReact()
             }
         }
@@ -57,8 +56,4 @@ class HTMLTextView: UITextView {
         ])
     }
 
-    override var intrinsicContentSize: CGSize {
-        let size = sizeThatFits(CGSize(width: bounds.width, height: CGFloat.greatestFiniteMagnitude))
-        return CGSize(width: UIView.noIntrinsicMetric, height: size.height)
-    }
 }
