@@ -31,6 +31,14 @@ class HTMLTextView: UITextView {
         }
     }
 
+    override var frame: CGRect {
+        didSet {
+            if self.frame != oldValue {
+                self.updateSizeToReact()
+            }
+        }
+    }
+
     private func updateContent() {
         guard let html = html else { return }
         let data = Data(html.utf8)
@@ -55,5 +63,4 @@ class HTMLTextView: UITextView {
             "height": size.height
         ])
     }
-
 }
